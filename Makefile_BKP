@@ -1,0 +1,67 @@
+# ==============================================================================
+# Makefile to Interact with Counterparty API
+# ==============================================================================
+# Required tools: make, curl, jq
+#
+# Usage:
+#   make all                  - Runs all commands in sequence.
+#   make check_balance        - Checks the PEPECASH balance.
+#   make issue_numeric_asset  - Creates the transaction for a numeric asset.
+#   make issue_named_asset    - Creates the transaction for a named asset.
+#   make help                 - Shows this help message.
+# ==============================================================================
+
+# --- User Configuration ---
+SOURCE_ADDRESS := bc1qd0nzd63c8qxzgq8649qwd5w8dfcrl8w8fk9x35
+API_URL        := https://api.counterparty.io:4000
+
+# --- Asset Configuration ---
+NUMERIC_ASSET_NAME := A173829102938475610
+NAMED_ASSET_NAME   := ASSETNAMEA173829102938475610
+ASSET_QUANTITY     := 10
+# Inscription in JSON format (escaped string for Makefile)
+INSCRIPTION_JSON := {"p":"brc-20","op":"mint","tick":"ordi","amt":"10"}
+
+# --- Internal Commands ---
+CURL_CMD = curl -s -X POST --header "Content-Type: application/json" -d
+
+# Default target
+default: help
+
+# Target to run all steps
+all: check_balance issue_numeric_asset issue_named_asset
+
+# --- API Targets ---
+
+# Target 1: Check PEPECASH balance
+check_balance:
+	@echo "--- 1. Checking PEPECASH balance for address $(SOURCE_ADDRESS)... ---"
+	@$(CURL_CMD) '{"jsonrpc":"2.0","id":0,"method":"get_balances","params":{"filters":[{"field":"address","op":"==","value":"$(SOURCE_ADDRESS)"},{"field":"asset","op":"==","value":"PEPECASH"}]}}' $(API_URL) | jq .
+	@echo ""
+
+# Target 2: Issue a Numeric Asset with Inscription
+issue_numeric_asset:
+	@echo "--- 2. Creating transaction to issue numeric asset $(NUMERIC_ASSET_NAME)... ---"
+	@echo "Reminder: The output below is an unsigned transaction. You must sign and broadcast it."
+	@$(CURL_CMD) '{"jsonrpc":"2.0","id":1,"method":"create_issuance","params":{"source":"$(SOURCE_ADDRESS)","asset":"$(NUMERIC_ASSET_NAME)","quantity":$(ASSET_QUANTITY),"description":"{\"p\":\"brc-20\",\"op\":\"mint\",\"tick\":\"ordi\",\"amt\":\"10\"}","divisible":true}}' $(API_URL) | jq .
+	@echo ""
+
+# Target 3: Issue a Named Asset with Inscription
+issue_named_asset:
+	@echo "--- 3. Creating transaction to issue named asset $(NAMED_ASSET_NAME)... ---"
+	@echo "Reminder: This operation costs 0.5 XCP and the output is an unsigned transaction."
+	@$(CURL_CMD) '{"jsonrpc":"2.0","id":2,"method":"create_issuance","params":{"source":"$(SOURCE_ADDRESS)","asset":"$(NUMERIC_ASSET_NAME)","quantity":$(ASSET_QUANTITY),"description":"{\"p\":\"brc-20\",\"op\":\"mint\",\"tick\":\"ordi\",\"amt\":\"10\"}","divisible":false}}' $(API_URL) | jq .
+	@echo ""
+
+# Help Targetcurl -s -X POST --header "Content-Type: application/json" -d '{"jsonrpc":"2.0","id":2,"method":"create_issuance","params":{"source":"bc1qd0nzd63c8qxzgq8649qwd5w8dfcrl8w8fk9x35","asset":"MYASSET01","quantity":10,"description":"{\"p\":\"brc-20\",\"op\":\"mint\",\"tick\":\"ordi\",\"amt\":\"10\"}","divisible":false}}' https://api.counterparty.io:4000 | jq .
+help:
+	@echo "Usage: make [target]"
+	@echo "------------------"
+	@echo "Available targets:"
+	@echo "  all                  - Runs all commands in sequence."
+	@echo "  check_balance        - Checks the PEPECASH balance."
+	@echo "  issue_numeric_asset  - Creates the transaction for a numeric asset with inscription."
+	@echo "  issue_named_asset    - Creates the transaction for a named asset with inscription."
+	@echo "  help                 - Shows this help message."
+
+.PHONY: all check_balance issue_numeric_asset issue_named_asset help default

@@ -1,0 +1,8 @@
+{
+  "error": {
+    "code": -32001,
+    "message": "Error composing issuance transaction via API: No UTXOs found for 1JXeYvPctZYLsFYcVyhuY2qsM3un7BMQmn, provide UTXOs with the `inputs_set` parameter"
+  },
+  "id": 2,
+  "jsonrpc": "2.0"
+}
