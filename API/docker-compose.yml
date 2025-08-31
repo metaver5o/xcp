@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  # Counterparty API Local em Node.js
+  counterparty-api:
+    build: .
+    ports:
+      - "4000:4000"
+      - "18332:18332"
+      - "18443:18443"
+    environment:
+      - NODE_ENV=development
+      - API_PORT=4000
+      - API_USER=local
+      - API_PASSWORD=localpass
+      - NETWORK=regtest
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - ./data:/app/data
+    networks:
+      - counterparty-network
+
+  # Bitcoin Regtest (opcional para testes completos)
+  bitcoin-regtest:
+    image: bitcoin/bitcoin-core
+    ports:
+      - "18443:18443"
+      - "18332:18332"
+    environment:
+      - BITCOIN_NETWORK=regtest
+      - BITCOIN_RPCUSER=local
+      - BITCOIN_RPCPASSWORD=localpass
+      - BITCOIN_RPCALLOWIP=0.0.0.0/0
+      - BITCOIN_TXINDEX=1
+      - BITCOIN_SERVER=1
+      - BITCOIN_RPCPORT=18332
+    volumes:
+      - bitcoin-data:/data
+    networks:
+      - counterparty-network
+
+networks:
+  counterparty-network:
+    driver: bridge
+
+volumes:
+  bitcoin-data:
