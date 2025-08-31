@@ -1,0 +1,5 @@
+{
+  "error": "Asset A183729102938475610 already exists",
+  "jsonrpc": "2.0",
+  "id": 1
+}

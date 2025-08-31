@@ -267,11 +267,13 @@ app.get('/state', authenticate, (req, res) => {
 
 // Reset do estado (apenas desenvolvimento)
 app.post('/reset', authenticate, (req, res) => {
-  Object.keys(blockchain).forEach(key => {
-    if (key !== 'addresses') {
-      blockchain[key] = {};
-    }
-  });
+  // Reset specific properties to their correct types
+  blockchain.balances = {};
+  blockchain.assets = {};
+  blockchain.transactions = [];
+  blockchain.issuances = [];
+  blockchain.nextAssetId = 1000;
+  // Keep addresses unchanged
   initializeTestData();
   res.json({ message: 'State reset successfully' });
 });
