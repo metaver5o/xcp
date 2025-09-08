@@ -22,7 +22,7 @@ Numeric assets use identifiers starting with 'A' followed by numbers. These are 
 
 ```bash
 curl -X GET "https://api.counterparty.io:4000/v2/addresses/bc1p865lxyp372lg0nhkze7kkd6u38vpaglrv5cdfjs3r83nk7jaqalqxzxhq8/compose/issuance?\
-asset=A123456789012345678&\
+asset=A987654321098765432&\
 quantity=1&\
 divisible=false&\
 description=This%20is%20my%20numeric%20asset&\
