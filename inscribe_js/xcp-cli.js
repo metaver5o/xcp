@@ -125,7 +125,22 @@ function createIssuance(state, {
       ordinals_compatible: Boolean(inscription),
       mime_type
     });
-    result = { commit: commitHex, reveal: revealHex };
+    result = { 
+      commit: commitHex, 
+      reveal: revealHex,
+      envelope: {
+        source,
+        asset,
+        quantity: Number(quantity),
+        description,
+        divisible,
+        encoding,
+        inscription,
+        mime_type,
+        file_path,
+        content_length: contentLength
+      }
+    };
   } else {
     const hex = encodeTxHex({
       type: 'issuance',
