@@ -1,53 +1,42 @@
-check pepecash balance
-⁠  curl -s -X POST --header "Content-Type: application/json" -d '{"jsonrpc":"2.0","id":0,"method":"get_balances","params":{"filters":[{"field":"address","op":"==","value":"bc1qd0nzd63c8qxzgq8649qwd5w8dfcrl8w8fk9x35"},{"field":"asset","op":"==","value":"PEPECASH"}]}}' https://api.counterparty.io:4000 | jq . ⁠
+# Counterparty Asset Issuance Commands
 
+This document provides examples for issuing different types of assets using the Counterparty API v2.
 
-issue numeric asset
-⁠  curl -s -X POST --header "Content-Type: application/json" -d '{"jsonrpc":"2.0","id":1,"method":"create_issuance","params":{"source":"bc1qd0nzd63c8qxzgq8649qwd5w8dfcrl8w8fk9x35","asset":"A173829102938475610","quantity":10,"description":"{\"p\":\"brc-20\",\"op\":\"mint\",\"tick\":\"ordi\",\"amt\":\"10\"}","divisible":true}}' https://api.counterparty.io:4000 | jq . ⁠
+## Named Assets
+Named assets use custom names (e.g., MYASSETNAME) as identifiers. These are more human-readable and easier to remember.
 
- curl -s -X POST --header "Content-Type: application/json" -d '{"jsonrpc":"2.0","id":2,"method":"create_issuance","params":{"source":"bc1qd0nzd63c8qxzgq8649qwd5w8dfcrl8w8fk9x35","asset":"MYASSETNAME","quantity":10,"description":"{\"p\":\"brc-20\",\"op\":\"mint\",\"tick\":\"ordi\",\"amt\":\"10\"}","divisible":false}}' https://api.counterparty.io:4000 | jq . ⁠
-
-
-###############
-V2
-
+```bash
+curl -X GET "https://api.counterparty.io:4000/v2/addresses/bc1p865lxyp372lg0nhkze7kkd6u38vpaglrv5cdfjs3r83nk7jaqalqxzxhq8/compose/issuance?\
+asset=MYASSETNAME&\
+quantity=1&\
+divisible=false&\
+description=This%20is%20my%20named%20asset&\
+encoding=taproot&\
+inscription=true&\
+fee_rate=25" \
+-H "Accept: application/json"
 ```
 
-curl -X POST "https://api.counterparty.io:4000/v2/addresses/bc1p865lxyp372lg0nhkze7kkd6u38vpaglrv5cdfjs3r83nk7jaqalqxzxhq8/compose/issuance?asset=MY_ASSET&quantity=1&divisible=false&encoding=taproot&inscription=true&fee_rate=2" \
--H "Accept: application/json" \
--H "Content-Type: application/json" \
--d '{
-  "description": "This is an inscription for a named asset.",
-  "mime_type": "text/plain"
-}'
+## Numeric Assets
+Numeric assets use identifiers starting with 'A' followed by numbers. These are useful for programmatic asset creation.
+
+```bash
+curl -X GET "https://api.counterparty.io:4000/v2/addresses/bc1p865lxyp372lg0nhkze7kkd6u38vpaglrv5cdfjs3r83nk7jaqalqxzxhq8/compose/issuance?\
+asset=A123456789012345678&\
+quantity=1&\
+divisible=false&\
+description=This%20is%20my%20numeric%20asset&\
+encoding=taproot&\
+inscription=true&\
+fee_rate=25" \
+-H "Accept: application/json"
 ```
 
-```
-Numeric asset insc
-
-curl -X POST "https://api.counterparty.io:4000/v2/addresses/bc1p865lxyp372lg0nhkze7kkd6u38vpaglrv5cdfjs3r83nk7jaqalqxzxhq8/compose/issuance?asset=123456&quantity=1&divisible=false&encoding=taproot&inscription=true&fee_rate=2" \
--H "Accept: application/json" \
--H "Content-Type: application/json" \
--d '{
-  "description": "Inscription for numeric asset 123456.",
-  "mime_type": "text/plain"
-}'
-```
-
-```
-JPEG 
-xxd -p "/path/to/your/image.jpg" | tr -d '\n' > image.hex
-
-curl -X POST "https://api.counterparty.io:4000/v2/addresses/bc1p865lxyp372lg0nhkze7kkd6u38vpaglrv5cdfjs3r83nk7jaqalqxzxhq8/compose/issuance?asset=JPEG_ASSET&quantity=1&divisible=false&encoding=taproot&inscription=true&fee_rate=2" \
--H "Accept: application/json" \
--H "Content-Type: application/json" \
--d '{
-  "description": "'"$(cat image.hex)"'",
-  "mime_type": "image/jpeg"
-}'
-```
-
-#############
-```
-curl -X GET "https://api.counterparty.io:4000/v2/addresses/bc1p865lxyp372lg0nhkze7kkd6u38vpaglrv5cdfjs3r83nk7jaqalqxzxhq8/compose/issuance?asset=A987654321098765432&quantity=1&divisible=false&description=This%20is%20my%20ordinal%20content&encoding=taproot&inscription=true" -H "Accept: application/json" | jq .
-```
+## Parameters Explained
+- `asset`: Asset identifier (MYASSETNAME for named assets, A... for numeric assets)
+- `quantity`: Amount of assets to issue
+- `divisible`: Whether the asset is divisible (true/false)
+- `description`: Asset description or inscription content
+- `encoding`: Use 'taproot' for ordinal-compatible inscriptions
+- `inscription`: Set to 'true' for ordinal compatibility
+- `fee_rate`: Transaction fee rate in satoshis/byte
